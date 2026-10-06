@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,14 +34,14 @@ class UserProfile {
   String password;
   String name;
   String? avatarPath; // Đường dẫn ảnh cục bộ từ thư viện thiết bị
-  String avatarUrl;  // Ảnh mặc định online nếu chưa chọn ảnh thiết bị
+  String avatarUrl; // Giữ lại để tương thích với dữ liệu tài khoản hiện có
 
   UserProfile({
     required this.email,
     required this.password,
     this.name = '', // Ban đầu để trống theo yêu cầu
     this.avatarPath,
-    this.avatarUrl = 'https://i.pravatar.cc/150?img=33',
+    this.avatarUrl = '',
   });
 }
 
@@ -162,7 +164,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         return 'Vui lòng nhập Email';
                       }
                       final emailRegex = RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                      );
                       if (!emailRegex.hasMatch(value.trim())) {
                         return 'Email không đúng định dạng';
                       }
@@ -232,10 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
 class DashboardScreen extends StatefulWidget {
   final UserProfile userProfile;
 
-  const DashboardScreen({
-    super.key,
-    required this.userProfile,
-  });
+  const DashboardScreen({super.key, required this.userProfile});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -253,7 +253,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedIndex == 0 ? 'Bảng tin Trang chủ' : 'Hồ sơ cá nhân'),
+        title: Text(
+          _selectedIndex == 0 ? 'Bảng tin Trang chủ' : 'Hồ sơ cá nhân',
+        ),
         centerTitle: true,
         elevation: 1,
       ),
@@ -266,14 +268,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           });
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Hồ sơ',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Hồ sơ'),
         ],
       ),
     );
@@ -290,36 +286,34 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> posts = [
       {
-        'author': 'Nguyễn Văn A',
-        'avatarUrl': 'https://i.pravatar.cc/150?img=11',
+        'author': 'Sopii',
+        'avatarUrl': 'https://photo-baomoi.bmcdn.me/w500_r1/2026_09_24_20_56117393/15b30fc8ba8353dd0a92.jpg',
         'time': '5 phút trước',
-        'content':
-            'Hôm nay thời tiết thật đẹp! Vừa hoàn thành xong ứng dụng Flutter giả lập giao diện mạng xã hội cực mượt. 🚀📱 #Flutter #MobileApp',
-        'likes': 18,
-        'comments': 5,
+        'content': 'Thank you everyone! ❤️❤️😘 #PUBG #BattleRoyale',
+        'likes': 12,
+        'comments': 3,
         'hasImage': true,
-        'imageUrl': 'https://picsum.photos/600/350?random=1',
+        'imageUrl': 'https://i.ytimg.com/an_webp/jdM3MoOrgb8/mqdefault_6s.webp?du=3000&sqp=CPS7kdYG&rs=AOn4CLBI-HpYjf2BitZueuAPqWvXDrPQ5w',
       },
       {
-        'author': 'Trần Thị B',
-        'avatarUrl': 'https://i.pravatar.cc/150?img=5',
+        'author': 'Lã Phương Tiến Đạt',
+        'avatarUrl': 'https://scontent.fsgn2-9.fna.fbcdn.net/v/t39.30808-1/742606471_122254499222088316_1116677582186169515_n.jpg?stp=dst-jpg_tt6&cstp=mx960x960&ctp=s200x200&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=lp8cnSzNYIcQ7kNvwF5jrC3&_nc_oc=AdrgwhI1LG3oE-5Ch9pOOdxLKwShVDItGzNWhN1eJcdt_W4de36UmTn0QJVubseSDZU&_nc_zt=24&_nc_ht=scontent.fsgn2-9.fna&_nc_gid=yEl73cQdhpSiNZeDTV8hYw&_nc_ss=7b2a8&oh=00_AQM0OV4CyC77kkUeT8ydgcmmv0tnRF34yTfjh5310y-sDg&oe=6ACA3868',
         'time': '1 giờ trước',
-        'content':
-            'Mọi người có gợi ý quán cà phê nào không gian yên tĩnh thích hợp để làm việc tại TP.HCM không nhỉ? Cho mình xin ý kiến nhé! ☕✨',
-        'likes': 32,
-        'comments': 12,
+        'content': 'CHÍNH THỨC THẤT NGHIỆP! 😭😭😭',
+        'likes': 199,
+        'comments': 95,
         'hasImage': false,
         'imageUrl': '',
       },
       {
-        'author': 'Lê Minh C',
-        'avatarUrl': 'https://i.pravatar.cc/150?img=8',
+        'author': 'MixiGaming',
+        'avatarUrl': 'https://scontent.fsgn2-10.fna.fbcdn.net/v/t1.6435-9/155836987_279784560163310_4097811254850609460_n.jpg?stp=dst-jpg_tt6&cstp=mx500x500&ctp=s500x500&_nc_cat=1&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=Gceavlb6POcQ7kNvwGS_8RV&_nc_oc=AdoFzZOVWaHgJGjSIO-yQiY6HL3q0qZRtq-DtF4b72S6_O9k-uxx3-PGZmEv7uAuJ-Y&_nc_zt=23&_nc_ht=scontent.fsgn2-10.fna&_nc_gid=hVWULe8CZ5I3NJgX5uU3tQ&_nc_ss=7b2a8&oh=00_AQMkEj5kaImBjW4YYmVMjuZFWwZtUT0WBDUxpP9X2dyAng&oe=6AEBCBF8',
         'time': '3 giờ trước',
-        'content': 'Cuối tuần rồi, xách balo lên và đi du lịch thôi nào! 🏖️⛰️',
+        'content': 'Từ nay Độ đã có thể nằm trên giường và nuôi\nkhủng long với MSI Claw 8 Ex 🦖🦖🦖\n#MSI',
         'likes': 64,
         'comments': 9,
         'hasImage': true,
-        'imageUrl': 'https://picsum.photos/600/350?random=2',
+        'imageUrl': 'https://scontent.fsgn2-5.fna.fbcdn.net/v/t39.30808-6/810149830_1630691835072569_4164834300515923947_n.jpg?stp=dst-jpg_tt6&cstp=mx2048x1152&ctp=s2048x1152&_nc_cat=104&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=833d8c&_nc_ohc=XR9TjubDPqAQ7kNvwFY3zHl&_nc_oc=Adpj-ATySI_UCACF9P-GM8jHzw0Jr5vXhGqj-DMnH07CTVn1oF_CuXjwhQ2phyPEEgA&_nc_zt=23&_nc_ht=scontent.fsgn2-5.fna&_nc_gid=PdZGtPm7o4AdTMXj_U8rOQ&_nc_ss=7b2a8&oh=00_AQOVwF_xHyGIEWUOFDRFNFyGwRN6BgNy2FIS6-DmaJc3xA&oe=6ACA31DF',
       },
     ];
 
@@ -340,6 +334,86 @@ class PostCard extends StatefulWidget {
 
   @override
   State<PostCard> createState() => _PostCardState();
+}
+
+class VideoPostMedia extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPostMedia({super.key, required this.videoUrl});
+
+  @override
+  State<VideoPostMedia> createState() => _VideoPostMediaState();
+}
+
+class _VideoPostMediaState extends State<VideoPostMedia> {
+  late final VideoPlayerController _controller;
+  late final Future<void> _initializeVideo;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    _initializeVideo = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initializeVideo,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Container(
+            height: 200,
+            color: Colors.grey[300],
+            alignment: Alignment.center,
+            child: const Text('Không thể tải video'),
+          );
+        }
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                VideoPlayer(_controller),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _controller.value.isPlaying
+                          ? _controller.pause()
+                          : _controller.play();
+                    });
+                  },
+                  icon: Icon(
+                    _controller.value.isPlaying
+                        ? Icons.pause_circle
+                        : Icons.play_circle,
+                    color: Colors.white,
+                    size: 56,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _PostCardState extends State<PostCard> {
@@ -396,10 +470,7 @@ class _PostCardState extends State<PostCard> {
                   ],
                 ),
                 const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {},
-                ),
+                IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
               ],
             ),
             const SizedBox(height: 10),
@@ -408,7 +479,10 @@ class _PostCardState extends State<PostCard> {
               style: const TextStyle(fontSize: 14, height: 1.4),
             ),
             const SizedBox(height: 10),
-            if (post['hasImage']) ...[
+            if (post['videoUrl'] != null) ...[
+              VideoPostMedia(videoUrl: post['videoUrl']),
+              const SizedBox(height: 10),
+            ] else if (post['hasImage']) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
@@ -459,7 +533,7 @@ class _PostCardState extends State<PostCard> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -473,10 +547,7 @@ class _PostCardState extends State<PostCard> {
 class ProfilePage extends StatefulWidget {
   final UserProfile userProfile;
 
-  const ProfilePage({
-    super.key,
-    required this.userProfile,
-  });
+  const ProfilePage({super.key, required this.userProfile});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -519,7 +590,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // Widget hiển thị ảnh đại diện (Tự động chuyển đổi giữa file local và URL)
+  // Hiển thị ảnh đã chọn; nếu chưa có thì hiển thị icon mặc định.
   Widget _buildAvatarWidget() {
     if (widget.userProfile.avatarPath != null &&
         widget.userProfile.avatarPath!.isNotEmpty) {
@@ -530,7 +601,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     return CircleAvatar(
       radius: 55,
-      backgroundImage: NetworkImage(widget.userProfile.avatarUrl),
+      backgroundColor: Colors.grey.shade300,
+      child: Icon(Icons.person, size: 64, color: Colors.grey.shade700),
     );
   }
 
@@ -731,8 +803,9 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: InputDecoration(
               labelText: 'Địa chỉ Email (Đã đăng nhập)',
               prefixIcon: const Icon(Icons.email_outlined),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               filled: true,
               fillColor: Colors.grey[200],
             ),
@@ -746,8 +819,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: OutlinedButton.icon(
               onPressed: _showChangePasswordDialog,
               icon: const Icon(Icons.lock_reset),
-              label:
-                  const Text('Đổi mật khẩu', style: TextStyle(fontSize: 16)),
+              label: const Text('Đổi mật khẩu', style: TextStyle(fontSize: 16)),
               style: OutlinedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
