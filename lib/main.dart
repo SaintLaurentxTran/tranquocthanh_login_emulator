@@ -33,6 +33,7 @@ class UserProfile {
   String email;
   String password;
   String name;
+  String studentId;
   String? avatarPath; // Đường dẫn ảnh cục bộ từ thư viện thiết bị
   String avatarUrl; // Giữ lại để tương thích với dữ liệu tài khoản hiện có
 
@@ -40,6 +41,7 @@ class UserProfile {
     required this.email,
     required this.password,
     this.name = '', // Ban đầu để trống theo yêu cầu
+    this.studentId = '',
     this.avatarPath,
     this.avatarUrl = '',
   });
@@ -555,16 +557,21 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _nameController;
+  late TextEditingController _studentIdController;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.userProfile.name);
+    _studentIdController = TextEditingController(
+      text: widget.userProfile.studentId,
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _studentIdController.dispose();
     super.dispose();
   }
 
@@ -796,7 +803,25 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
 
-          // --- 3. Mục Địa chỉ Email (Đã đăng nhập) ---
+          // --- 3. Mục Mã số sinh viên (Tự động lưu khi gõ) ---
+          TextField(
+            controller: _studentIdController,
+            onChanged: (value) {
+              widget.userProfile.studentId = value;
+              UserStore.updateUser(widget.userProfile);
+            },
+            decoration: InputDecoration(
+              labelText: 'Mã số sinh viên',
+              hintText: 'Nhập mã số sinh viên của bạn...',
+              prefixIcon: const Icon(Icons.badge_outlined),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // --- 4. Mục Địa chỉ Email (Đã đăng nhập) ---
           TextField(
             controller: TextEditingController(text: widget.userProfile.email),
             enabled: false,
@@ -812,7 +837,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 24),
 
-          // --- 4. Ô Đổi mật khẩu ---
+          // --- 5. Ô Đổi mật khẩu ---
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -829,7 +854,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
 
-          // --- 5. Ô Đăng xuất ---
+          // --- 6. Ô Đăng xuất ---
           SizedBox(
             width: double.infinity,
             height: 48,
